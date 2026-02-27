@@ -1,0 +1,22 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "supermodeltools-uncompact",
+  "description": "Stop Claude Code compaction from making your AI stupid. Reinjects project context after compaction, powered by the Supermodel Public API.",
+  "owner": {
+    "name": "Supermodel",
+    "email": "abe@supermodel.software"
+  },
+  "plugins": [
+    {
+      "name": "uncompact",
+      "description": "Re-inject project context into Claude Code after compaction, powered by the Supermodel API.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Supermodel",
+        "email": "abe@supermodel.software"
+      },
+      "source": ".",
+      "category": "productivity"
+    }
+  ]
+}
