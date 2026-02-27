@@ -30,7 +30,7 @@ The fastest way to integrate Uncompact is via the Claude Code plugin system — 
 
 ```bash
 /plugin marketplace add supermodeltools/Uncompact
-/plugin install uncompact@supermodeltools-uncompact
+/plugin install uncompact@supermodeltools-Uncompact
 ```
 
 This installs both hooks automatically:

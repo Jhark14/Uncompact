@@ -1,6 +1,6 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "supermodeltools-uncompact",
+  "name": "supermodeltools-Uncompact",
   "description": "Stop Claude Code compaction from making your AI stupid. Reinjects project context after compaction, powered by the Supermodel Public API.",
   "owner": {
     "name": "Supermodel",
