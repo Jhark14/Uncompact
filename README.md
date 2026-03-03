@@ -113,7 +113,7 @@ go install github.com/supermodeltools/uncompact@latest
 uncompact auth login
 ```
 
-This opens [dashboard.supermodeltools.com](https://dashboard.supermodeltools.com) where you can subscribe and generate an API key.
+This opens [dashboard.supermodeltools.com/api-keys/](https://dashboard.supermodeltools.com/api-keys/) where you can subscribe and generate an API key.
 
 ### 3. Install Claude Code Hooks
 
