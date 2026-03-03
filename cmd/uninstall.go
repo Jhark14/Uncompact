@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/supermodeltools/uncompact/internal/config"
 	"github.com/supermodeltools/uncompact/internal/hooks"
 )
 
