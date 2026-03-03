@@ -26,7 +26,12 @@ const (
 
 // Config holds the Uncompact configuration.
 type Config struct {
-	APIKey    string `json:"api_key"`
+	// APIKey is the decrypted API key. It is not stored in plain text.
+	APIKey string `json:"-"`
+
+	// SecureAPIKey is the encrypted API key stored in the config file.
+	SecureAPIKey string `json:"api_key,omitempty"`
+
 	BaseURL   string `json:"base_url,omitempty"`
 	MaxTokens int    `json:"max_tokens,omitempty"`
 	Mode      string `json:"mode,omitempty"` // "local" or "api"; empty = auto-detect
@@ -138,9 +143,24 @@ func Load(flagAPIKey string) (*Config, error) {
 		if err := json.Unmarshal(data, cfg); err != nil {
 			return nil, fmt.Errorf("malformed config file %s: %w", cfgFile, err)
 		}
-		if cfg.APIKey != "" {
-			cfg.Source = "config file"
+
+		// Decrypt or migrate the API key
+		if cfg.SecureAPIKey != "" {
+			if strings.HasPrefix(cfg.SecureAPIKey, "smsk_") {
+				// Migration: existing plain text key found
+				cfg.APIKey = cfg.SecureAPIKey
+				cfg.Source = "config file (migrated to secure storage)"
+			} else {
+				// Normal case: decrypt the secure key
+				decrypted, err := decrypt(cfg.SecureAPIKey)
+				if err != nil {
+					return nil, fmt.Errorf("decrypting API key from config: %w", err)
+				}
+				cfg.APIKey = decrypted
+				cfg.Source = "config file"
+			}
 		}
+
 		if cfg.Mode != "" {
 			cfg.Mode = strings.ToLower(strings.TrimSpace(cfg.Mode))
 			if err := ValidateMode(cfg.Mode); err != nil {
@@ -185,6 +205,17 @@ func Load(flagAPIKey string) (*Config, error) {
 
 // Save writes the config to disk.
 func Save(cfg *Config) error {
+	// Encrypt the API key before saving
+	if cfg.APIKey != "" {
+		encrypted, err := encrypt(cfg.APIKey)
+		if err != nil {
+			return fmt.Errorf("encrypting API key for storage: %w", err)
+		}
+		cfg.SecureAPIKey = encrypted
+	} else {
+		cfg.SecureAPIKey = ""
+	}
+
 	dir, err := ConfigDir()
 	if err != nil {
 		return err

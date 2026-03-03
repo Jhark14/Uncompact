@@ -209,10 +209,15 @@ async function main() {
     try {
       const authStatus = execSync(checkAuthCmd).toString();
       if (authStatus.includes("Status: not authenticated") || authStatus.includes("✗")) {
-        console.log("\n[uncompact] Authentication required. Taking you to the dashboard...");
+        log("\n[uncompact] Authentication required. Starting login flow...\n");
         try {
-          execFileSync(destPath, ["auth", "open"], { stdio: "inherit" });
-        } catch (e) {}
+          // Use 'auth login' which opens browser AND prompts for key
+          execFileSync(destPath, ["auth", "login"], { stdio: "inherit" });
+          log("\n[uncompact] Login successful.\n");
+        } catch (err) {
+          log(`\n[uncompact] Login process exited: ${err.message}\n`);
+          log("[uncompact] You can run it manually later: uncompact auth login\n");
+        }
       }
     } catch (e) {}
   } catch (err) {

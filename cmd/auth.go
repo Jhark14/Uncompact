@@ -67,6 +67,7 @@ func authLoginHandler(cmd *cobra.Command, args []string) error {
 	_ = browser.OpenURL(config.DashboardKeyURL)
 
 	fmt.Println("2. Sign in, create an API key, and paste it below.")
+	fmt.Println("   (The input will be hidden for security)")
 	fmt.Print("   API Key: ")
 
 	var key string
@@ -98,6 +99,9 @@ func authLoginHandler(cmd *cobra.Command, args []string) error {
 	identity, err := testClient.ValidateKey(ctx)
 	if err != nil {
 		fmt.Println("✗")
+		if strings.Contains(err.Error(), "402") {
+			return fmt.Errorf("subscription required: visit %s to subscribe", config.DashboardURL)
+		}
 		return fmt.Errorf("key validation failed: %w", err)
 	}
 	fmt.Println("✓")

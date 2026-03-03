@@ -163,7 +163,17 @@ func statusHandler(cmd *cobra.Command, args []string) error {
 		}
 
 		if !isValid {
-			fmt.Println("  1. Your API key needs validation or is invalid. Run 'uncompact auth login'.")
+			// Check if it's a 402 subscription error
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			client := api.New(cfg.BaseURL, cfg.APIKey, false, nil)
+			_, err := client.ValidateKey(ctx)
+			if err != nil && strings.Contains(err.Error(), "402") {
+				fmt.Println("  1. Subscription required. Visit the dashboard to subscribe:")
+				fmt.Println("     " + config.DashboardURL)
+			} else {
+				fmt.Println("  1. Your API key needs validation or is invalid. Run 'uncompact auth login'.")
+			}
 		}
 
 		if settingsPath != "" {
