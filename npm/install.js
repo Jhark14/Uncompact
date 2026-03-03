@@ -188,21 +188,27 @@ async function main() {
 
   // Automatically install Claude Code hooks
   log("[uncompact] Configuring Claude Code hooks...\n");
+  let installSuccessful = false;
   try {
     // The 'install' command now automatically shows the help menu upon completion
     execFileSync(destPath, ["install", "--yes"], { stdio: "inherit" });
-    
-    // Also show status to verify API key detection
-    console.log();
-    execFileSync(destPath, ["status"], { stdio: "inherit" });
+    installSuccessful = true;
   } catch (err) {
     log("[uncompact] Note: Automatic hook configuration skipped or failed. Run manually if needed:\n");
     log("  uncompact install\n");
-    
-    // Fallback: Show help if the install command failed
-    try {
-      execFileSync(destPath, [], { stdio: "inherit" });
-    } catch (e) {}
+  }
+
+  // Always show status to verify API key detection, regardless of install success
+  try {
+    console.log();
+    execFileSync(destPath, ["status"], { stdio: "inherit" });
+  } catch (err) {
+    // If status fails, show help as a fallback if we haven't shown anything yet
+    if (!installSuccessful) {
+      try {
+        execFileSync(destPath, [], { stdio: "inherit" });
+      } catch (e) {}
+    }
   }
   log("\n");
 }
