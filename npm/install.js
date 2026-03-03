@@ -111,14 +111,15 @@ function extractZip(buffer, destDir, binaryName) {
 
 function log(msg) {
   process.stderr.write(msg);
-  try {
-    if (process.platform !== "win32" && process.stdout.isTTY) {
+  // Only write to /dev/tty if stderr is NOT a TTY, to avoid double-logging
+  if (!process.stderr.isTTY && process.platform !== "win32") {
+    try {
       const tty = fs.openSync("/dev/tty", "w");
       fs.writeSync(tty, msg);
       fs.closeSync(tty);
+    } catch (err) {
+      // Ignore TTY errors
     }
-  } catch (err) {
-    // Ignore TTY errors
   }
 }
 
@@ -204,22 +205,26 @@ async function main() {
     execFileSync(destPath, ["status"], { stdio: "inherit" });
 
     // If not authenticated, take them to the next step automatically
-    const config = require(path.join(__dirname, "..", "package.json")); // Need version check logic? No, just use binary
-    const checkAuthCmd = `"${destPath}" auth status`;
-    try {
-      const authStatus = execSync(checkAuthCmd).toString();
-      if (authStatus.includes("Status: not authenticated") || authStatus.includes("✗")) {
-        log("\n[uncompact] Authentication required. Starting login flow...\n");
-        try {
-          // Use 'auth login' which opens browser AND prompts for key
-          execFileSync(destPath, ["auth", "login"], { stdio: "inherit" });
-          log("\n[uncompact] Login successful.\n");
-        } catch (err) {
-          log(`\n[uncompact] Login process exited: ${err.message}\n`);
-          log("[uncompact] You can run it manually later: uncompact auth login\n");
+    // Only attempt interactive login if we are in a terminal (TTY)
+    if (process.stdin.isTTY) {
+      const checkAuthCmd = `"${destPath}" auth status`;
+      try {
+        const authStatus = execSync(checkAuthCmd).toString();
+        if (authStatus.includes("Status: not authenticated") || authStatus.includes("✗")) {
+          log("\n[uncompact] Authentication required. Starting login flow...\n");
+          try {
+            // Use 'auth login' which opens browser AND prompts for key
+            execFileSync(destPath, ["auth", "login"], { stdio: "inherit" });
+            log("\n[uncompact] Login successful.\n");
+          } catch (err) {
+            log(`\n[uncompact] Login process exited: ${err.message}\n`);
+            log("[uncompact] You can run it manually later: uncompact auth login\n");
+          }
         }
-      }
-    } catch (e) {}
+      } catch (e) {}
+    } else {
+      log("\n[uncompact] Authentication required. Run 'uncompact auth login' to connect your account.\n");
+    }
   } catch (err) {
     // If status fails, show help as a fallback if we haven't shown anything yet
     if (!installSuccessful) {
