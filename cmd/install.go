@@ -50,6 +50,10 @@ func installHandler(cmd *cobra.Command, args []string) error {
 
 	if result.AlreadySet {
 		fmt.Println("✓ Uncompact hooks are already installed.")
+		fmt.Println()
+		fmt.Println("---")
+		fmt.Println()
+		_ = rootCmd.Help()
 		return nil
 	}
 
@@ -94,7 +98,12 @@ func installHandler(cmd *cobra.Command, args []string) error {
 	fmt.Println("  Stop hook:             reinjects context after Claude Code compaction")
 	fmt.Println("  UserPromptSubmit hook: replays context bomb into AI context on your next message")
 	fmt.Println()
-	fmt.Println("Test it: uncompact run --debug")
+	fmt.Println("---")
+	fmt.Println()
+
+	// Show help output to guide the user
+	_ = rootCmd.Help()
+
 	return nil
 }
 

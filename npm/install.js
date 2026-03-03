@@ -189,19 +189,18 @@ async function main() {
   // Automatically install Claude Code hooks
   log("[uncompact] Configuring Claude Code hooks...\n");
   try {
+    // The 'install' command now automatically shows the help menu upon completion
     execFileSync(destPath, ["install", "--yes"], { stdio: "inherit" });
   } catch (err) {
     log("[uncompact] Note: Automatic hook configuration skipped or failed. Run manually if needed:\n");
     log("  uncompact install\n");
+    
+    // Fallback: Show help if the install command failed
+    try {
+      execFileSync(destPath, [], { stdio: "inherit" });
+    } catch (e) {}
   }
   log("\n");
-
-  // Show help output after install
-  try {
-    execFileSync(destPath, [], { stdio: "inherit" });
-  } catch (err) {
-    // Ignore errors from running the binary itself
-  }
 }
 
 main().catch((err) => {
