@@ -191,6 +191,10 @@ async function main() {
   try {
     // The 'install' command now automatically shows the help menu upon completion
     execFileSync(destPath, ["install", "--yes"], { stdio: "inherit" });
+    
+    // Also show status to verify API key detection
+    console.log();
+    execFileSync(destPath, ["status"], { stdio: "inherit" });
   } catch (err) {
     log("[uncompact] Note: Automatic hook configuration skipped or failed. Run manually if needed:\n");
     log("  uncompact install\n");

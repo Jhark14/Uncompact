@@ -52,10 +52,10 @@ func authLoginHandler(cmd *cobra.Command, args []string) error {
 	fmt.Println("Uncompact uses the Supermodel Public API.")
 	fmt.Println()
 	fmt.Println("1. Opening your browser to the Supermodel dashboard...")
-	fmt.Println("   " + config.DashboardURL)
+	fmt.Println("   " + config.DashboardKeyURL)
 	fmt.Println()
 
-	_ = browser.OpenURL(config.DashboardURL)
+	_ = browser.OpenURL(config.DashboardKeyURL)
 
 	fmt.Println("2. Sign in, create an API key, and paste it below.")
 	fmt.Print("   API Key: ")
