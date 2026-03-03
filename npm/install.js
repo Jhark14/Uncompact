@@ -175,6 +175,14 @@ async function main() {
   }
 
   console.log(`[uncompact] Installed to ${destPath}`);
+  console.log();
+
+  // Show help output after install
+  try {
+    execFileSync(destPath, [], { stdio: "inherit" });
+  } catch (err) {
+    // Ignore errors from running the binary itself
+  }
 }
 
 main().catch((err) => {
