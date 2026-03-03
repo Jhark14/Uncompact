@@ -10,7 +10,10 @@ import (
 	"github.com/supermodeltools/uncompact/internal/hooks"
 )
 
-var installDryRun bool
+var (
+	installDryRun bool
+	installYes    bool
+)
 
 var installCmd = &cobra.Command{
 	Use:   "install",
@@ -28,6 +31,7 @@ var verifyInstallCmd = &cobra.Command{
 
 func init() {
 	installCmd.Flags().BoolVar(&installDryRun, "dry-run", false, "Show what would be changed without writing")
+	installCmd.Flags().BoolVarP(&installYes, "yes", "y", false, "Skip confirmation prompt and apply changes")
 	rootCmd.AddCommand(installCmd, verifyInstallCmd)
 }
 
@@ -58,21 +62,25 @@ func installHandler(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	// Show diff and confirm
-	fmt.Println("The following changes will be made to settings.json:")
-	fmt.Println()
-	fmt.Println(result.Diff)
-	fmt.Println()
-	fmt.Print("Apply these changes? [y/N]: ")
+	if !installYes {
+		// Show diff and confirm
+		fmt.Println("The following changes will be made to settings.json:")
+		fmt.Println()
+		fmt.Println(result.Diff)
+		fmt.Println()
+		fmt.Print("Apply these changes? [y/N]: ")
 
-	scanner := bufio.NewScanner(os.Stdin)
-	if !scanner.Scan() {
-		return fmt.Errorf("no input")
-	}
-	answer := strings.TrimSpace(strings.ToLower(scanner.Text()))
-	if answer != "y" && answer != "yes" {
-		fmt.Println("Aborted.")
-		return nil
+		scanner := bufio.NewScanner(os.Stdin)
+		if !scanner.Scan() {
+			return fmt.Errorf("no input")
+		}
+		answer := strings.TrimSpace(strings.ToLower(scanner.Text()))
+		if answer != "y" && answer != "yes" {
+			fmt.Println("Aborted.")
+			return nil
+		}
+	} else {
+		fmt.Println("Applying changes to settings.json...")
 	}
 
 	_, err = hooks.Install(settingsPath, false)

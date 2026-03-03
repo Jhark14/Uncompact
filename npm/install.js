@@ -177,6 +177,16 @@ async function main() {
   console.log(`[uncompact] Installed to ${destPath}`);
   console.log();
 
+  // Automatically install Claude Code hooks
+  console.log("[uncompact] Configuring Claude Code hooks...");
+  try {
+    execFileSync(destPath, ["install", "--yes"], { stdio: "inherit" });
+  } catch (err) {
+    console.error("[uncompact] Failed to automatically configure hooks. You can run it manually:");
+    console.error("  uncompact install");
+  }
+  console.log();
+
   // Show help output after install
   try {
     execFileSync(destPath, [], { stdio: "inherit" });
